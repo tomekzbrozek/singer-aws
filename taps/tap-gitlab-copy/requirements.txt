@@ -1,0 +1,3 @@
+setuptools==46.1.3
+wheel==0.34.2
+git+ssh://git@gitlab.com/new10/datascience/tap-gitlab.git@master

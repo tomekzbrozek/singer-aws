@@ -1,0 +1,6 @@
+setuptools==46.1.3
+wheel==0.34.2
+psycopg2-binary==2.8.5
+git+ssh://git@gitlab.com/new10/datascience/target-redshift.git@master
+botocore==1.12.253
+boto3==1.9.253

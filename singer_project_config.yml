@@ -1,0 +1,48 @@
+data_bucket: acme-dev-airflow-data
+
+redshift_aws_profile: acme-data
+
+# if your S3 & Redshift cluster is deployed in an isolated AWS account,
+# specify an AWS IAM role that should be assumed to interact with those resources
+redshift_iam_role: arn:aws:iam::123456789010:role/airflow-data-dev
+
+# specify how your config dicts are prefixed in AWS Parameter Store
+ssm_prefix: /acme_singer_project
+
+# `module` property is optional (if it is different than tap/target key
+# in the list of `taps`/`targets`, e.g. when there are two tap integrations
+# to be added based on the same tap module)
+taps:
+    # tap-example-aliased:
+    #   schema: example_schema_name
+    #   catalog_arg: --catalog (or --properties)
+    #   module: tap-example # original python module name (as opposed to alias which starts this block)
+
+    tap-exchangeratesapi:
+      schema: rates
+      catalog_arg: --catalog
+
+    tap-adwords:
+      schema: adwords
+      catalog_arg: --properties
+
+    tap-facebook:
+      schema: facebook
+      catalog_arg: --properties
+
+    tap-mambu-fork:
+      module: tap-mambu
+      schema: mambu_fork
+      catalog_arg: --catalog
+
+    tap-gitlab-copy:
+      schema: gitlab_copy
+      module: tap-gitlab
+
+targets:
+    target-redshift:
+      # some modules will require additional env vars present during installation of a virtual environment
+      env_vars: {"LDFLAGS": "-I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib"}
+
+    target-csv:
+      config_param: 'dummy'

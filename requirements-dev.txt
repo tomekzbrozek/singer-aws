@@ -1,0 +1,4 @@
+boto3
+pyyaml
+git+git://github.com/chrisgoddard/singer-discover@master
+git+git://github.com/singer-io/singer-tools@master
