@@ -3,7 +3,6 @@
 CLI tool for easy execution of Singer Taps, managing module dependencies and persistence of state files and config files in AWS.
 
 # ToDo:
-* add catalog inspection (so that users can see which streams/columns are selected: true)
 * package the whole project as Docker image
 * create infrastructure: S3 buckets, SSM parameter store items (manually), `SingerTap` IAM role tied to S3 bucket and allowed to access Redshift
 * store logs in logs/ folder
@@ -42,6 +41,41 @@ export AWS_PROFILE=your_profile
 singer-aws-discover --tap adwords
 ```
 
+## Inspecting singer catalogs for subsequent discoveries
+
+Subsequent schema discoveries, e.g. updates or selecting new fields for replication may be annoying because the `schema-discovery` utility (see credits below) only shows what's available, without showing what's already selected (i.e. you kind of start catalog selection form the scratch with each discovery). To allow for more seamless workflow, there's a `singer-aws-inspect` command that can be used to inspect current state of catalog of a given tap. For instance:
+
+```
+singer-aws-inspect --tap adwords
+```
+
+would print:
+
+```
+...
+inspecting stream: ads...
+    ❌ stream is NOT SELECTED
+    • found 6 available properties
+    • found 0 selected properties
+    • selected properties: []
+inspecting stream: accounts...
+    ❌ stream is NOT SELECTED
+    • found 6 available properties
+    • found 0 selected properties
+    • selected properties: []
+inspecting stream: KEYWORDS_PERFORMANCE_REPORT...
+    ✅ stream is SELECTED
+    • found 139 available properties
+    • found 12 selected properties
+    • selected properties: ['account', 'campaignID', 'campaign', 'clicks', 'conversions', 'cost', 'keyword', 'day', 'device', 'customerID', 'keywordID', 'impressions']
+...
+```
+
+## Credits
+
+`singer-aws-discover` command leverages an amazing utility: [singer-discover](https://github.com/chrisgoddard/singer-discover). Thank you @chrisgoddard!
+
+
 # Running tap | target
 
 1. in the command line, export AWS_PROFILE that has permissions to read from SSM and read/write to S3:
@@ -68,13 +102,14 @@ or, if there is any state file existing for a given tap (state file must exist i
 venv/tap-adwords/bin/tap-adwords --config taps/tap-adwords/config.json --properties taps/tap-adwords/catalog.json --state states_in/tap-adwords-state.json | venv/target-redshift/bin/target-redshift --config targets/target-redshift/config.json > /Users/tomaszzbrozek/singer-aws/states_out/tap-adwords-state.json
 ```
 
-:point-up: state file (in `states_in/` directory) is fetched on the fly before executing the `tap | target`. Specify S3 bucket name and prefix in the `states_bucket` parameter inside `singer_project_config.yml` file.
+:point_up: state file (in `states_in/` directory) is fetched on the fly before executing the `tap | target`. Specify S3 bucket name and prefix in the `states_bucket` parameter inside `singer_project_config.yml` file.
 
 You can pass `--ignore-state` to ignore previous state files when executing the tap and use `start_date` as specified in tap's config to replicate all streams:
 
 ```
 singer-aws-sync --tap adwords --target redshift --ignore-state
 ```
+
 
 # What this project is not intended for
 

@@ -11,10 +11,11 @@ setup(
     install_requires=[],
     entry_points=
     '''
-      [console_scripts]
+    [console_scripts]
       singer-aws-sync=singer_aws.main:main
       singer-aws-discover=singer_aws.discover:main
       singer-aws-install=singer_aws.install_venvs:main
+      singer-aws-inspect=singer_aws.inspect_catalog:main
     ''',
     packages=["singer_aws"],
     include_package_data=True,
